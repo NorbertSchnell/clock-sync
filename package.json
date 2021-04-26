@@ -1,0 +1,17 @@
+{
+  "name": "clock-sync",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@ircam/sync": "^1.0.1",
+    "babel-runtime": "^6.23.0",
+    "ws": "^7.4.4"
+  },
+  "devDependencies": {
+    "@types/mongodb": "^3.6.9",
+    "@types/node": "^14.14.31",
+    "@types/ws": "^7.4.0"
+  }
+}
