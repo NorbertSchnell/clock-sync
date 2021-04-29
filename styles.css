@@ -17,26 +17,41 @@ h1 {
   font-family: monospace;
 }
 
+#days::after {
+  content: ":";
+  font-family: sans-serif;
+}
+
 #days {
   font-size: 2em;
 }
 
-#hours {
+#days::before {
+  content: "days ";
+}
+
+#days::after {
+  content: ", ";
+}
+
+#hours, #minutes, #seconds {
   font-size: 4em;
 }
 
-#minutes {
-  font-size: 4em;
-}
-
-#seconds {
-  font-size: 4em;
+#hours::after, #minutes::after  {
+  position: relative;
+  top: -0.05em;
+  left: 0.05em;
+  font-size: 0.7em;
+  content: ":";
+  font-family: sans-serif;
 }
 
 #milliseconds {
   font-size: 2em;
 }
 
-#status {
-  font-size: 2em;
+#milliseconds::before {
+  content: ".";
+  font-family: sans-serif;
 }

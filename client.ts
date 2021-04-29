@@ -1,80 +1,45 @@
-//const url: string = "wss://sync.herokuapp.com/";
-const url: string = "ws://localhost:8000/";
+const syncServerURL: string = "wss://nschnell.uber.space/sync/";
+//const syncServerURL: string = "ws://localhost:8000/";
 
 const daysElem: HTMLSpanElement = <HTMLSpanElement>document.querySelector("#days");
 const hoursElem: HTMLSpanElement = <HTMLSpanElement>document.querySelector("#hours");
 const minutesElem: HTMLSpanElement = <HTMLSpanElement>document.querySelector("#minutes");
 const secondsElem: HTMLSpanElement = <HTMLSpanElement>document.querySelector("#seconds");
 const millisecondsElem: HTMLSpanElement = <HTMLSpanElement>document.querySelector("#milliseconds");
-const statusContainer: HTMLSpanElement = <HTMLSpanElement>document.querySelector("#connection-status");
-let connected: boolean = false;
 
-const getTimeFunction: GetTimeFunction = () => {
-  return performance.now() / 1000;
-};
+// create sync client
+const clientSync: ClientSync = new ClientSync(syncServerURL);
 
-// init socket client
-const socket: WebSocket = new WebSocket(url);
-socket.binaryType = "arraybuffer";
+function formatNumber(value: number, targetDigits: number): string {
+  const valueDigits: number = Math.floor(Math.log10(value)) + 1;
+  let numZeros: number = 0;
 
-// init sync client
-const syncClient: SyncClient = new SyncClient(getTimeFunction);
+  if (value === 0) {
+    numZeros = targetDigits - 1;
+  } else if (valueDigits < targetDigits) {
+    numZeros = targetDigits - valueDigits;
+  }
+
+  return "0".repeat(numZeros) + value.toString();
+}
 
 setInterval(() => {
-  if (connected) {
-    const syncTime: number = syncClient.getSyncTime();
-    const seconds: number = Math.floor(syncTime);
-    const minutes: number = Math.floor(seconds / 60);
-    const hours: number = Math.floor(minutes / 60);
-    const days: number = Math.floor(hours / 24);
-    const milliseconds: number = Math.floor(1000 * syncTime + 0.5);
+  if (clientSync.connected) {
+    let milliseconds: number = Math.floor(1000 * clientSync.syncTime + 0.5);
+    let seconds: number = Math.floor(clientSync.syncTime);
+    let minutes: number = Math.floor(seconds / 60);
+    let hours: number = Math.floor(minutes / 60);
+    let days: number = Math.floor(hours / 24);
 
-    daysElem.innerHTML = `day ${days}, `;
-    hoursElem.innerHTML = `${hours % 24}:`;
-    minutesElem.innerHTML = `${minutes % 60}:`;
-    secondsElem.innerHTML = `${seconds % 60}`;
-    millisecondsElem.innerHTML = `.${milliseconds % 1000}`;
+    hours %= 24;
+    minutes %= 60;
+    seconds %= 60;
+    milliseconds %= 1000;
+
+    daysElem.innerHTML = days.toString();
+    hoursElem.innerHTML = formatNumber(hours, 2);
+    minutesElem.innerHTML = formatNumber(minutes, 2);
+    secondsElem.innerHTML = formatNumber(seconds, 2);
+    millisecondsElem.innerHTML = formatNumber(milliseconds, 3);
   }
 }, 100);
-
-socket.addEventListener("open", () => {
-  const sendFunction: SendFunction = (pingId, clientPingTime) => {
-    const request: Float64Array = new Float64Array(3);
-    request[0] = 0; // this is a ping
-    request[1] = pingId;
-    request[2] = clientPingTime;
-
-    // console.log(`[ping] - id: %s, pingTime: %s`, request[1], request[2]);
-
-    socket.send(request.buffer);
-  };
-
-  const receiveFunction: ReceiveFunction = (callback) => {
-    socket.addEventListener("message", e => {
-      const response: Float64Array = new Float64Array(e.data);
-
-      if (response[0] === 1) { // this is a pong
-        const pingId: number = response[1];
-        const clientPingTime: number = response[2];
-        const serverPingTime: number = response[3];
-        const serverPongTime: number = response[4];
-
-        // console.log(`[pong] - id: %s, clientPingTime: %s, serverPingTime: %s, serverPongTime: %s`, pingId, clientPingTime, serverPingTime, serverPongTime);
-
-        callback(pingId, clientPingTime, serverPingTime, serverPongTime);
-      }
-    });
-  };
-
-  const statusFunction: StatusFunction = (status) => {
-    connected = (status.connection == "online");
-
-    // statusContainer.innerHTML = JSON.stringify(status, null, 2);
-    // console.log(status);
-  };
-
-  syncClient.start(sendFunction, receiveFunction, statusFunction);
-});
-
-socket.addEventListener("error", (err) => console.error(err));
-socket.addEventListener("close", () => console.log("socket closed"));

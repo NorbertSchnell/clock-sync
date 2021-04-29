@@ -1,3 +1,54 @@
+class ClientSync {
+  constructor(serverUrl) {
+    this.syncClient = new SyncClient(() => performance.now() / 1000);
+    this.connected = false;
+
+    const socket = new WebSocket(serverUrl);
+    socket.binaryType = "arraybuffer";
+
+    function receiveFunction(callback) {
+      socket.addEventListener("message", (evt) => {
+        const response = new Float64Array(evt.data);
+
+        if (response[0] === 1) { // this is a pong
+          const pingId = response[1];
+          const clientPingTime = response[2];
+          const serverPingTime = response[3];
+          const serverPongTime = response[4];
+
+          callback(pingId, clientPingTime, serverPingTime, serverPongTime);
+        }
+      });
+    }
+
+    function sendFunction(pingId, clientPingTime) {
+      const request = new Float64Array(3);
+      request[0] = 0; // this is a ping
+      request[1] = pingId;
+      request[2] = clientPingTime;
+
+      socket.send(request.buffer);
+    }
+
+    socket.addEventListener("open", () => {
+      this.syncClient.start(sendFunction, receiveFunction, (status) => {
+        this.connected = (status.connection == "online");
+      });
+    });
+
+    socket.addEventListener("close", () => {
+      this.connected = false;
+      console.log("socket closed");
+    });
+
+    socket.addEventListener("error", (err) => console.error(err));
+  }
+
+  get syncTime() {
+    return this.syncClient.getSyncTime();
+  }
+}
+
 /**
  * @fileOverview Estimation of a server time from a client time.
  *
@@ -35,7 +86,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-const log = console.log;
+//const log = console.log;
+function log() { }
 
 ////// helpers
 
