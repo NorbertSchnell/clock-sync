@@ -1,17 +1,10 @@
 body {
   width: 100%;
   height: 100%;
+  margin: 0;
 }
 
 #video {
   display: block;
-  width: 480px;
-  height: 360px;
-  margin: 40px;
+  width: 100%;
 }
-
-#audio {
-  display: block;
-  margin: 40px;
-}
-
