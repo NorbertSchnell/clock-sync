@@ -10,6 +10,7 @@ var audioPlayer;
     const maxDelta = 0.500;
     // state
     let commonStartTime = 0; // not implemented yet
+    let lastAdjustTime = 0;
     let speed = 0;
     // get audio element
     const audioElement = document.getElementById("audio");
@@ -35,22 +36,24 @@ var audioPlayer;
     function adjustTimimg() {
         if (speed > 0) {
             const time = clientSync.syncTime;
-            const targetTime = (time - commonStartTime + offset) % audioDuration;
-            const audioTime = audioElement.currentTime;
-            let delta = audioTime - targetTime;
-            if (delta > maxDelta || delta < -maxDelta) {
-                audioElement.currentTime = targetTime;
-                audioElement.playbackRate = 1;
-                audioElement.play();
-                speed = 1;
-                // console.log("jumping:", time, targetTime, audioTime, delta, speed);
+            if (time - lastAdjustTime > adjustTimePeriod) {
+                const targetTime = (time - commonStartTime + offset) % audioDuration;
+                const audioTime = audioElement.currentTime;
+                let delta = audioTime - targetTime;
+                if (delta > maxDelta || delta < -maxDelta) {
+                    audioElement.currentTime = targetTime;
+                    audioElement.playbackRate = 1;
+                    audioElement.play();
+                    speed = 1;
+                    // console.log("jumping:", time, targetTime, audioTime, delta, speed);
+                }
+                else {
+                    speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
+                    audioElement.playbackRate = speed;
+                    // console.log("adjusting speed:", time, targetTime, audioTime, delta, speed);
+                }
+                requestAnimationFrame(adjustTimimg);
             }
-            else {
-                speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
-                audioElement.playbackRate = speed;
-                // console.log("adjusting speed:", time, targetTime, audioTime, delta, speed);
-            }
-            requestAnimationFrame(adjustTimimg);
         }
     }
 })(audioPlayer || (audioPlayer = {}));

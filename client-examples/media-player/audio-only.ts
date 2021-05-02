@@ -11,6 +11,7 @@ namespace audioPlayer {
 
   // state
   let commonStartTime: number = 0; // not implemented yet
+  let lastAdjustTime: number = 0;
   let speed: number = 0;
 
   // get audio element
@@ -44,23 +45,26 @@ namespace audioPlayer {
   function adjustTimimg(): void {
     if (speed > 0) {
       const time: number = clientSync.syncTime;
-      const targetTime: number = (time - commonStartTime + offset) % audioDuration;
-      const audioTime: number = audioElement.currentTime;
-      let delta: number = audioTime - targetTime;
 
-      if (delta > maxDelta || delta < -maxDelta) {
-        audioElement.currentTime = targetTime;
-        audioElement.playbackRate = 1;
-        audioElement.play();
-        speed = 1;
-        // console.log("jumping:", time, targetTime, audioTime, delta, speed);
-      } else {
-        speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
-        audioElement.playbackRate = speed;
-        // console.log("adjusting speed:", time, targetTime, audioTime, delta, speed);
+      if (time - lastAdjustTime > adjustTimePeriod) {
+        const targetTime: number = (time - commonStartTime + offset) % audioDuration;
+        const audioTime: number = audioElement.currentTime;
+        let delta: number = audioTime - targetTime;
+
+        if (delta > maxDelta || delta < -maxDelta) {
+          audioElement.currentTime = targetTime;
+          audioElement.playbackRate = 1;
+          audioElement.play();
+          speed = 1;
+          // console.log("jumping:", time, targetTime, audioTime, delta, speed);
+        } else {
+          speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
+          audioElement.playbackRate = speed;
+          // console.log("adjusting speed:", time, targetTime, audioTime, delta, speed);
+        }
+
+        requestAnimationFrame(adjustTimimg);
       }
-
-      requestAnimationFrame(adjustTimimg);
     }
   }
 }

@@ -11,6 +11,7 @@ namespace videoPlayer {
 
   // state
   let commonStartTime: number = 0; // not implemented yet
+  let lastAdjustTime: number = 0;
   let speed: number = 0;
 
   // get video element
@@ -44,23 +45,28 @@ namespace videoPlayer {
   function adjustTimimg(): void {
     if (speed > 0) {
       const time: number = clientSync.syncTime;
-      const targetTime: number = (time - commonStartTime + offset) % videoDuration;
-      const videoTime: number = videoElement.currentTime;
-      let delta: number = videoTime - targetTime;
 
-      if (delta > maxDelta || delta < -maxDelta) {
-        videoElement.currentTime = targetTime;
-        videoElement.playbackRate = 1;
-        videoElement.play();
-        speed = 1;
-        // console.log("jumping:", time, targetTime, videoTime, delta, speed);
-      } else {
-        speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
-        videoElement.playbackRate = speed;
-        // console.log("adjusting speed:", time, targetTime, videoTime, delta, speed);
+      if (time - lastAdjustTime > adjustTimePeriod) {
+        const targetTime: number = (time - commonStartTime + offset) % videoDuration;
+        const videoTime: number = videoElement.currentTime;
+        let delta: number = videoTime - targetTime;
+
+        if (delta > maxDelta || delta < -maxDelta) {
+          videoElement.currentTime = targetTime;
+          videoElement.playbackRate = 1;
+          videoElement.play();
+          speed = 1;
+          // console.log("jumping:", time, targetTime, videoTime, delta, speed);
+        } else {
+          speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
+          videoElement.playbackRate = speed;
+          // console.log("adjusting speed:", time, targetTime, videoTime, delta, speed);
+        }
+
+        requestAnimationFrame(adjustTimimg);
       }
 
-      requestAnimationFrame(adjustTimimg);
+      lastAdjustTime = time;
     }
   }
 }

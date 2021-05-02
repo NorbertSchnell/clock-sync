@@ -10,6 +10,7 @@ var videoPlayer;
     const maxDelta = 0.500;
     // state
     let commonStartTime = 0; // not implemented yet
+    let lastAdjustTime = 0;
     let speed = 0;
     // get video element
     const videoElement = document.getElementById("video");
@@ -35,22 +36,25 @@ var videoPlayer;
     function adjustTimimg() {
         if (speed > 0) {
             const time = clientSync.syncTime;
-            const targetTime = (time - commonStartTime + offset) % videoDuration;
-            const videoTime = videoElement.currentTime;
-            let delta = videoTime - targetTime;
-            if (delta > maxDelta || delta < -maxDelta) {
-                videoElement.currentTime = targetTime;
-                videoElement.playbackRate = 1;
-                videoElement.play();
-                speed = 1;
-                // console.log("jumping:", time, targetTime, videoTime, delta, speed);
+            if (time - lastAdjustTime > adjustTimePeriod) {
+                const targetTime = (time - commonStartTime + offset) % videoDuration;
+                const videoTime = videoElement.currentTime;
+                let delta = videoTime - targetTime;
+                if (delta > maxDelta || delta < -maxDelta) {
+                    videoElement.currentTime = targetTime;
+                    videoElement.playbackRate = 1;
+                    videoElement.play();
+                    speed = 1;
+                    // console.log("jumping:", time, targetTime, videoTime, delta, speed);
+                }
+                else {
+                    speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
+                    videoElement.playbackRate = speed;
+                    // console.log("adjusting speed:", time, targetTime, videoTime, delta, speed);
+                }
+                requestAnimationFrame(adjustTimimg);
             }
-            else {
-                speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
-                videoElement.playbackRate = speed;
-                // console.log("adjusting speed:", time, targetTime, videoTime, delta, speed);
-            }
-            requestAnimationFrame(adjustTimimg);
+            lastAdjustTime = time;
         }
     }
 })(videoPlayer || (videoPlayer = {}));
