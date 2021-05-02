@@ -30,8 +30,8 @@ namespace videoPlayer {
     const targetTime: number = (time - commonStartTime + offset) % videoDuration;
 
     videoElement.currentTime = targetTime;
-    videoElement.playbackRate = 1;
     videoElement.play();
+    videoElement.playbackRate = 1;
     speed = 1;
     // console.log("starting:", time, targetTime, videoDuration);
 
@@ -53,14 +53,14 @@ namespace videoPlayer {
 
         if (delta > maxDelta || delta < -maxDelta) {
           videoElement.currentTime = targetTime;
-          videoElement.playbackRate = 1;
           videoElement.play();
+          videoElement.playbackRate = 1;
           speed = 1;
-          // console.log("jumping:", time, targetTime, videoTime, delta, speed);
+          console.log("jumping:", time, targetTime, videoTime, delta, speed, videoElement.playbackRate);
         } else {
           speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
           videoElement.playbackRate = speed;
-          // console.log("adjusting speed:", time, targetTime, videoTime, delta, speed);
+          console.log("adjusting speed:", time, targetTime, videoTime, delta, speed, videoElement.playbackRate);
         }
 
         requestAnimationFrame(adjustTimimg);
