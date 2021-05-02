@@ -63,8 +63,10 @@ namespace audioPlayer {
           // console.log("adjusting speed:", time, targetTime, audioTime, delta, speed);
         }
 
-        requestAnimationFrame(adjustTimimg);
+        lastAdjustTime = time;
       }
+
+      requestAnimationFrame(adjustTimimg);
     }
   }
 }

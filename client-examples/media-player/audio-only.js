@@ -52,8 +52,9 @@ var audioPlayer;
                     audioElement.playbackRate = speed;
                     // console.log("adjusting speed:", time, targetTime, audioTime, delta, speed);
                 }
-                requestAnimationFrame(adjustTimimg);
+                lastAdjustTime = time;
             }
+            requestAnimationFrame(adjustTimimg);
         }
     }
 })(audioPlayer || (audioPlayer = {}));

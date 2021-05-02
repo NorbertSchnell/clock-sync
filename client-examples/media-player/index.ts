@@ -63,10 +63,10 @@ namespace videoPlayer {
           console.log("adjusting speed:", time, targetTime, videoTime, delta, speed, videoElement.playbackRate);
         }
 
-        requestAnimationFrame(adjustTimimg);
+        lastAdjustTime = time;
       }
 
-      lastAdjustTime = time;
+      requestAnimationFrame(adjustTimimg);
     }
   }
 }
