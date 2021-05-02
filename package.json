@@ -2,7 +2,7 @@
   "name": "clock-sync",
   "version": "1.0.0",
   "scripts": {
-    "start": "node server.js"
+    "start": "node sync-server.js"
   },
   "dependencies": {
     "@ircam/sync": "^1.0.1",

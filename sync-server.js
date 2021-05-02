@@ -43,4 +43,4 @@ wss.on("connection", (socket) => {
     };
     syncServer.start(sendFunction, receiveFunction);
 });
-//# sourceMappingURL=server.js.map
+//# sourceMappingURL=sync-server.js.map

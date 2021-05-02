@@ -1,0 +1,19 @@
+body {
+  width: 100%;
+  height: 100%;
+}
+
+#movie {
+}
+
+@media (orientation: landscape) {
+  #movie {
+    height: 100%;
+  }
+}
+
+@media (orientation: portrait) {
+  #movie {
+    width: 100%;
+  }
+}
