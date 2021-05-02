@@ -1,6 +1,6 @@
 "use strict";
-var mediaPLayer;
-(function (mediaPLayer) {
+var videoPlayer;
+(function (videoPlayer) {
     const syncServerURL = "wss://nschnell.uber.space/sync/";
     //const syncServerURL: string = "ws://localhost:8000/";
     // parameters
@@ -53,5 +53,5 @@ var mediaPLayer;
             requestAnimationFrame(adjustTimimg);
         }
     }
-})(mediaPLayer || (mediaPLayer = {}));
+})(videoPlayer || (videoPlayer = {}));
 //# sourceMappingURL=index.js.map

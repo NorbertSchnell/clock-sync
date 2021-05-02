@@ -1,6 +1,6 @@
 "use strict";
-var mediaPLayer;
-(function (mediaPLayer) {
+var audioPlayer;
+(function (audioPlayer) {
     const syncServerURL = "wss://nschnell.uber.space/sync/";
     //const syncServerURL: string = "ws://localhost:8000/";
     // parameters
@@ -53,5 +53,5 @@ var mediaPLayer;
             requestAnimationFrame(adjustTimimg);
         }
     }
-})(mediaPLayer || (mediaPLayer = {}));
+})(audioPlayer || (audioPlayer = {}));
 //# sourceMappingURL=audio-only.js.map

@@ -1,4 +1,4 @@
-namespace mediaPLayer {
+namespace audioPlayer {
   const syncServerURL: string = "wss://nschnell.uber.space/sync/";
   //const syncServerURL: string = "ws://localhost:8000/";
 
