@@ -43,7 +43,7 @@ namespace videoPlayer {
   });
 
   function adjustTimimg(): void {
-    if (speed > 0) {
+    if (speed !== 0) {
       const time: number = clientSync.syncTime;
 
       if (time - lastAdjustTime > adjustTimePeriod) {
@@ -56,11 +56,11 @@ namespace videoPlayer {
           videoElement.play();
           videoElement.playbackRate = 1;
           speed = 1;
-          // console.log("jumping:", time, targetTime, videoTime, delta, speed);
+          //console.log("jumping:", time, targetTime, videoTime, delta, speed);
         } else {
           speed = Math.max(minSpeed, Math.min(maxSpeed, (adjustTimePeriod - delta) / adjustTimePeriod));
           videoElement.playbackRate = speed;
-          // console.log("adjusting speed:", time, targetTime, videoTime, delta, speed);
+          //console.log("adjusting speed:", time, targetTime, videoTime, delta, speed);
         }
 
         lastAdjustTime = time;
